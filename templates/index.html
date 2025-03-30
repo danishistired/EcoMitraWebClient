@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoMitra - Query Viewer</title>
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+</head>
+<body>
+    <div class="header">
+        <h1>EcoMitra</h1>
+    </div>
+
+    <div class="query-container" id="query-list">
+        <!-- Queries will be dynamically added here -->
+    </div>
+
+    <div id="details-section" class="hidden">
+        <div class="image-section">
+            <h2>Uploaded Image</h2>
+            <img id="uploaded-image" src="" alt="Uploaded Image">
+        </div>
+
+        <div class="map-section">
+            <h2>Location on Map</h2>
+            <div id="map"></div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
