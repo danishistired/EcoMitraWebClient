@@ -3,29 +3,376 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EcoMitra - Query Viewer</title>
-    
+    <title>EcoMitra - Waste Management Dashboard</title>
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <div class="header">
-        <h1>EcoMitra</h1>
-    </div>
-
-    <div class="query-container" id="query-list">
-        <!-- Queries will be dynamically added here -->
-    </div>
-
-    <div id="details-section" class="hidden">
-        <div class="image-section">
-            <h2>Uploaded Image</h2>
-            <img id="uploaded-image" src="" alt="Uploaded Image">
+    <div class="app-container">
+        <div class="sidebar">
+            <div class="logo-container">
+                <i class="fas fa-leaf logo-icon"></i>
+                <h1>EcoMitra</h1>
+            </div>
+            <div class="sidebar-menu">
+                <div class="menu-item active" data-section="reports-section">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>Reports</span>
+                </div>
+                <div class="menu-item" data-section="analytics-section">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Analytics</span>
+                </div>
+                <div class="menu-item" data-section="teams-section">
+                    <i class="fas fa-users"></i>
+                    <span>Teams</span>
+                </div>
+                <div class="menu-item" data-section="settings-section">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </div>
+            </div>
+            <div class="sidebar-footer">
+                <i class="fas fa-question-circle"></i>
+                <span>Help & Support</span>
+            </div>
         </div>
 
-        <div class="map-section">
-            <h2>Location on Map</h2>
-            <div id="map"></div>
+        <div class="main-content">
+            <div class="top-bar">
+                <div class="page-title">
+                    <h2>Waste Reports Dashboard</h2>
+                    <p>Monitor and manage waste reports from citizens</p>
+                </div>
+                <div class="user-profile">
+                    <div class="notification-icon" id="notification-icon">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge">3</span>
+                        <div class="dropdown-menu notification-dropdown hidden">
+                            <div class="dropdown-header">
+                                <h3>Notifications</h3>
+                                <button class="mark-all-read">Mark all as read</button>
+                            </div>
+                            <div class="dropdown-items">
+                                <div class="dropdown-item">
+                                    <i class="fas fa-exclamation-circle text-warning"></i>
+                                    <div class="notification-content">
+                                        <p>New report submitted in Sector 7</p>
+                                        <span class="notification-time">5 minutes ago</span>
+                                    </div>
+                                </div>
+                                <div class="dropdown-item">
+                                    <i class="fas fa-check-circle text-success"></i>
+                                    <div class="notification-content">
+                                        <p>Team Alpha resolved a report</p>
+                                        <span class="notification-time">1 hour ago</span>
+                                    </div>
+                                </div>
+                                <div class="dropdown-item">
+                                    <i class="fas fa-user-plus text-info"></i>
+                                    <div class="notification-content">
+                                        <p>New team member added to Team Beta</p>
+                                        <span class="notification-time">Yesterday</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="dropdown-footer">
+                                <a href="#">View all notifications</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="profile-image" id="profile-icon">
+                        <i class="fas fa-user-circle"></i>
+                        <div class="dropdown-menu profile-dropdown hidden">
+                            <div class="dropdown-header">
+                                <h3>Admin User</h3>
+                                <p>admin@ecomitra.org</p>
+                            </div>
+                            <div class="dropdown-items">
+                                <a href="#" class="dropdown-item">
+                                    <i class="fas fa-user"></i> My Profile
+                                </a>
+                                <a href="#" class="dropdown-item">
+                                    <i class="fas fa-cog"></i> Account Settings
+                                </a>
+                                <a href="#" class="dropdown-item">
+                                    <i class="fas fa-question-circle"></i> Help Center
+                                </a>
+                            </div>
+                            <div class="dropdown-footer">
+                                <a href="#" class="logout-btn">
+                                    <i class="fas fa-sign-out-alt"></i> Logout
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <span>Admin</span>
+                </div>
+            </div>
+
+            <div class="dashboard-content">
+                <div class="stats-container">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-trash-alt"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Total Reports</h3>
+                            <p id="total-reports">0</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Resolved</h3>
+                            <p id="resolved-reports">0</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Pending</h3>
+                            <p id="pending-reports">0</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reports Section -->
+                <div id="reports-section" class="content-section reports-section">
+                    <div class="section-header">
+                        <h2><i class="fas fa-list"></i> Recent Reports</h2>
+                        <div class="filter-dropdown">
+                            <button class="filter-btn" id="filter-btn">
+                                <i class="fas fa-filter"></i> Filter
+                            </button>
+                            <div class="dropdown-menu filter-menu hidden">
+                                <div class="dropdown-header">
+                                    <h3>Filter Reports</h3>
+                                </div>
+                                <div class="dropdown-items">
+                                    <div class="filter-item">
+                                        <label>Status:</label>
+                                        <select id="status-filter">
+                                            <option value="all">All</option>
+                                            <option value="pending">Pending</option>
+                                            <option value="assigned">Assigned</option>
+                                        </select>
+                                    </div>
+                                    <div class="filter-item">
+                                        <label>Date Range:</label>
+                                        <select id="date-filter">
+                                            <option value="all">All Time</option>
+                                            <option value="today">Today</option>
+                                            <option value="week">This Week</option>
+                                            <option value="month">This Month</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="dropdown-footer">
+                                    <button id="apply-filter" class="apply-filter-btn">Apply Filters</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="reports-container">
+                        <div class="reports-list" id="query-list">
+                            <!-- Queries will be dynamically added here -->
+                            <div class="loading-placeholder">
+                                <i class="fas fa-spinner fa-pulse"></i>
+                                <p>Loading reports...</p>
+                            </div>
+                        </div>
+
+                        <div id="details-section" class="report-details hidden">
+                            <div class="details-header">
+                                <h3><i class="fas fa-info-circle"></i> Report Details</h3>
+                                <button class="close-details" onclick="hideDetails()">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+
+                            <div class="details-content">
+                                <div class="image-section">
+                                    <h4><i class="fas fa-camera"></i> Uploaded Image</h4>
+                                    <div class="image-container">
+                                        <img id="uploaded-image" src="/placeholder.svg" alt="Uploaded Image">
+                                        <div class="image-overlay">
+                                            <button class="zoom-btn" onclick="toggleImageZoom()">
+                                                <i class="fas fa-search-plus"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="map-section">
+                                    <h4><i class="fas fa-map-marked-alt"></i> Location</h4>
+                                    <div id="map"></div>
+                                </div>
+
+                                <div class="action-buttons">
+                                    <button class="action-btn resolve-btn" id="resolve-btn">
+                                        <i class="fas fa-check"></i> Mark as Resolved
+                                    </button>
+                                    <button class="action-btn assign-btn" id="assign-btn">
+                                        <i class="fas fa-user-plus"></i> Assign Team
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Analytics Section (Hidden by default) -->
+                <div id="analytics-section" class="content-section analytics-section hidden">
+                    <div class="section-header">
+                        <h2><i class="fas fa-chart-line"></i> Analytics Dashboard</h2>
+                    </div>
+                    <div class="analytics-content">
+                        <div class="analytics-card">
+                            <h3>Reports by Area</h3>
+                            <div class="placeholder-chart">
+                                <i class="fas fa-chart-bar"></i>
+                                <p>Area distribution chart will appear here</p>
+                            </div>
+                        </div>
+                        <div class="analytics-card">
+                            <h3>Reports Over Time</h3>
+                            <div class="placeholder-chart">
+                                <i class="fas fa-chart-line"></i>
+                                <p>Time series chart will appear here</p>
+                            </div>
+                        </div>
+                        <div class="analytics-card">
+                            <h3>Team Performance</h3>
+                            <div class="placeholder-chart">
+                                <i class="fas fa-chart-pie"></i>
+                                <p>Team performance metrics will appear here</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Teams Section (Hidden by default) -->
+                <div id="teams-section" class="content-section teams-section hidden">
+                    <div class="section-header">
+                        <h2><i class="fas fa-users"></i> Cleanup Teams</h2>
+                        <button class="add-team-btn">
+                            <i class="fas fa-plus"></i> Add Team
+                        </button>
+                    </div>
+                    <div class="teams-container" id="teams-container">
+                        <!-- Teams will be dynamically added here -->
+                        <div class="loading-placeholder">
+                            <i class="fas fa-spinner fa-pulse"></i>
+                            <p>Loading teams...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Settings Section (Hidden by default) -->
+                <div id="settings-section" class="content-section settings-section hidden">
+                    <div class="section-header">
+                        <h2><i class="fas fa-cog"></i> System Settings</h2>
+                    </div>
+                    <div class="settings-container">
+                        <div class="settings-card">
+                            <h3>Notification Settings</h3>
+                            <div class="settings-form">
+                                <div class="form-group">
+                                    <label class="toggle-label">
+                                        <span>Email Notifications</span>
+                                        <input type="checkbox" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                <div class="form-group">
+                                    <label class="toggle-label">
+                                        <span>SMS Notifications</span>
+                                        <input type="checkbox">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                <div class="form-group">
+                                    <label class="toggle-label">
+                                        <span>Push Notifications</span>
+                                        <input type="checkbox" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="settings-card">
+                            <h3>System Preferences</h3>
+                            <div class="settings-form">
+                                <div class="form-group">
+                                    <label>Default Map View</label>
+                                    <select>
+                                        <option>Street View</option>
+                                        <option>Satellite View</option>
+                                        <option>Hybrid View</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Data Refresh Rate</label>
+                                    <select>
+                                        <option>5 seconds</option>
+                                        <option>10 seconds</option>
+                                        <option>30 seconds</option>
+                                        <option>1 minute</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div id="loading-spinner" class="hidden">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Image Modal -->
+    <div id="image-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="toggleImageZoom()">&times;</span>
+            <img id="modal-image" src="/placeholder.svg" alt="Enlarged Image">
+        </div>
+    </div>
+
+    <!-- Team Assignment Modal -->
+    <div id="team-modal" class="modal">
+        <div class="modal-content team-modal-content">
+            <span class="close-modal" onclick="toggleTeamModal()">&times;</span>
+            <h2>Assign Team</h2>
+            <div class="team-selection">
+                <p>Select a team to handle this waste report:</p>
+                <div class="team-options" id="team-options">
+                    <!-- Team options will be added dynamically -->
+                </div>
+                <div class="modal-actions">
+                    <button class="cancel-btn" onclick="toggleTeamModal()">Cancel</button>
+                    <button class="confirm-btn" id="confirm-team-btn">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Toast -->
+    <div id="toast" class="toast">
+        <div class="toast-content">
+            <i class="fas fa-check-circle toast-icon"></i>
+            <div class="toast-message">Operation completed successfully!</div>
         </div>
     </div>
 
@@ -33,3 +380,4 @@
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
+
